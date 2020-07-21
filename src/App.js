@@ -1,6 +1,6 @@
 import React, { Suspense } from "react"
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom"
-import { VirtualHexapod, getNewPlotParams } from "./hexapod"
+import { VirtualHexapod } from "./hexapod"
 import * as defaults from "./templates"
 import { SECTION_NAMES, PATHS } from "./components/vars"
 import { Nav, NavDetailed, DimensionsWidget } from "./components"
@@ -21,17 +21,12 @@ function gtag() {
     window.dataLayer.push(arguments)
 }
 
-class App extends React.Component {
-    plot = {
-        cameraView: defaults.CAMERA_VIEW,
-        data: defaults.DATA,
-        layout: defaults.LAYOUT,
-    }
 
+
+class App extends React.Component {
     state = {
         inHexapodPage: false,
-        hexapodDimensions: defaults.DEFAULT_DIMENSIONS,
-        hexapodPose: defaults.DEFAULT_POSE,
+        hexapod: new VirtualHexapod(defaults.DEFAULT_DIMENSIONS, defaults.DEFAULT_POSE),
         revision: 0,
     }
 
@@ -50,7 +45,7 @@ class App extends React.Component {
         }
 
         this.setState({ inHexapodPage: true })
-        this.updatePlot(this.state.hexapodDimensions, defaults.DEFAULT_POSE)
+        this.updatePlot(this.state.hexapod.dimensions, defaults.DEFAULT_POSE)
     }
 
     updatePlotWithHexapod = hexapod => {
@@ -58,18 +53,10 @@ class App extends React.Component {
             return
         }
 
-        const [data, layout] = getNewPlotParams(hexapod, this.plot.cameraView)
-        this.plot = { ...this.plot, data, layout }
-
         this.setState({
             revision: this.state.revision + 1,
-            hexapodDimensions: hexapod.dimensions,
-            hexapodPose: hexapod.pose,
+            hexapod,
         })
-    }
-
-    logCameraView = relayoutData => {
-        this.plot.cameraView = relayoutData["scene.camera"]
     }
 
     updatePlot = (dimensions, pose) => {
@@ -77,32 +64,18 @@ class App extends React.Component {
         this.updatePlotWithHexapod(newHexapodModel)
     }
 
-    updateDimensions = dimensions => this.updatePlot(dimensions, this.state.hexapodPose)
+    updateDimensions = dimensions => this.updatePlot(dimensions, this.state.hexapod.pose)
 
-    updatePose = pose => this.updatePlot(this.state.hexapodDimensions, pose)
+    updatePose = pose => this.updatePlot(this.state.hexapod.dimensions, pose)
 
     /* * * * * * * * * * * * * *
      * Widgets
      * * * * * * * * * * * * * */
 
-    hexapodPlot = () => {
-        const { revision } = this.state
-        const { data, layout } = this.plot
-        const props = { data, layout, revision, onRelayout: this.logCameraView }
-
-        return (
-            <div className="plot border">
-                <Suspense fallback={<h1>Loading 3d plot...</h1>}>
-                    <HexapodPlot {...props} />
-                </Suspense>
-            </div>
-        )
-    }
-
     dimensions = () => (
         <div hidden={!this.state.inHexapodPage}>
             <DimensionsWidget
-                params={{ dimensions: this.state.hexapodDimensions }}
+                params={{ dimensions: this.state.hexapod.dimensions }}
                 onUpdate={this.updateDimensions}
             />
         </div>
@@ -111,16 +84,16 @@ class App extends React.Component {
     /* * * * * * * * * * * * * *
      * Pages
      * * * * * * * * * * * * * */
-    get hexapodParams() {
-        return {
-            dimensions: this.state.hexapodDimensions,
-            pose: this.state.hexapodPose,
-        }
-    }
-
-    pageComponent = (Component, onUpdate, params) => (
+    pageComponent = (Component, onUpdate) => (
         <Suspense fallback={<h1>Loading page</h1>}>
-            <Component onMount={this.onPageLoad} onUpdate={onUpdate} params={params} />
+            <Component
+                onMount={this.onPageLoad}
+                onUpdate={onUpdate}
+                params={{
+                    pose: this.state.hexapod.pose,
+                    dimensions: this.state.hexapod.dimensions,
+                }}
+            />
         </Suspense>
     )
 
@@ -128,24 +101,11 @@ class App extends React.Component {
 
     pagePatterns = () => this.pageComponent(LegPatternPage, this.updatePose)
 
-    pageIk = () =>
-        this.pageComponent(
-            InverseKinematicsPage,
-            this.updatePlotWithHexapod,
-            this.hexapodParams
-        )
+    pageIk = () => this.pageComponent(InverseKinematicsPage, this.updatePlotWithHexapod)
 
-    pageFk = () =>
-        this.pageComponent(ForwardKinematicsPage, this.updatePose, {
-            pose: this.state.hexapodPose,
-        })
+    pageFk = () => this.pageComponent(ForwardKinematicsPage, this.updatePose)
 
-    pageWalking = () =>
-        this.pageComponent(
-            WalkingGaitsPage,
-            this.updatePlotWithHexapod,
-            this.hexapodParams
-        )
+    pageWalking = () => this.pageComponent(WalkingGaitsPage, this.updatePlotWithHexapod)
 
     page = () => (
         <Switch>
@@ -172,7 +132,12 @@ class App extends React.Component {
                     {this.dimensions()}
                     {this.page()}
                 </div>
-                {this.state.inHexapodPage ? this.hexapodPlot() : null}
+                {this.state.inHexapodPage ? (
+                    <HexapodPlot
+                        hexapod={this.state.hexapod}
+                        revision={this.state.revision}
+                    />
+                ) : null}
             </div>
             {this.state.inHexapodPage ? <NavDetailed /> : null}
         </Router>

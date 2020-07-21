@@ -1,4 +1,4 @@
-import React, { Suspense } from "react"
+import React from "react"
 import Plotly from "plotly.js-gl3d-dist-min"
 import createPlotlyComponent from "react-plotly.js/factory"
 import * as defaults from "../templates"
@@ -26,13 +26,7 @@ class HexapodPlot extends React.Component {
             useResizeHandler: true,
         }
 
-        return (
-            <div className="plot border">
-                <Suspense fallback={<h1>Loading 3d plot...</h1>}>
-                    <Plot {...props} />
-                </Suspense>
-            </div>
-        )
+        return <Plot {...props} />
     }
 }
 

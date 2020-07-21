@@ -3,13 +3,16 @@ import ReactDOM from "react-dom"
 import "./index.css"
 import "./font.css"
 import * as serviceWorker from "./serviceWorker"
+import { BrowserRouter as Router } from "react-router-dom"
 
 const App = React.lazy(() => import("./App"))
 
 ReactDOM.render(
     <React.StrictMode>
         <Suspense fallback={<h1>Loading...</h1>}>
-            <App />
+            <Router>
+                <App />
+            </Router>
         </Suspense>
     </React.StrictMode>,
     document.getElementById("root")

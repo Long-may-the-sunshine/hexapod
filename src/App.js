@@ -3,42 +3,10 @@ import { VirtualHexapod } from "./hexapod"
 import * as defaults from "./templates"
 import { SECTION_NAMES } from "./components/vars"
 import { Nav, NavDetailed, DimensionsWidget } from "./components"
-
-import { PATHS } from "./components/vars"
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom"
-import { ForwardKinematicsPage, LegPatternPage, LandingPage } from "./components/pages"
+import Routes from "./Routes"
 
 const HexapodPlot = React.lazy(() =>
     import(/* webpackPrefetch: true */ "./components/HexapodPlot")
-)
-const InverseKinematicsPage = React.lazy(() =>
-    import(/* webpackPrefetch: true */ "./components/pages/InverseKinematicsPage")
-)
-const WalkingGaitsPage = React.lazy(() =>
-    import(/* webpackPrefetch: true */ "./components/pages/WalkingGaitsPage")
-)
-
-const Routes = pageComponent => (
-    <Switch>
-        <Route path="/" exact>
-            {pageComponent(LandingPage)}
-        </Route>
-        <Route path={PATHS.legPatterns.path} exact>
-            {pageComponent(LegPatternPage)}
-        </Route>
-        <Route path={PATHS.forwardKinematics.path} exact>
-            {pageComponent(InverseKinematicsPage)}
-        </Route>
-        <Route path={PATHS.inverseKinematics.path} exact>
-            {pageComponent(ForwardKinematicsPage)}
-        </Route>
-        <Route path={PATHS.walkingGaits.path} exact>
-            {pageComponent(WalkingGaitsPage)}
-        </Route>
-        <Route>
-            <Redirect to="/" />
-        </Route>
-    </Switch>
 )
 
 window.dataLayer = window.dataLayer || []
@@ -67,10 +35,7 @@ class App extends React.Component {
         }
 
         this.setState({ inHexapodPage: true })
-        this.manageState("both", {
-            dimensions: this.state.hexapod.dimensions,
-            pose: defaults.DEFAULT_POSE,
-        })
+        this.manageState("pose", { pose: defaults.DEFAULT_POSE })
     }
 
     manageState = (type, newParams) => {
@@ -86,10 +51,6 @@ class App extends React.Component {
 
         if (type === "hexapod") {
             hexapod = newParams.hexapod
-        }
-
-        if (type === "both") {
-            hexapod = new VirtualHexapod(newParams.dimensions, newParams.pose)
         }
 
         if (!hexapod || !hexapod.foundSolution) {
@@ -136,7 +97,7 @@ class App extends React.Component {
      * * * * * * * * * * * * * */
 
     render = () => (
-        <Router>
+        <>
             <Nav />
             <div className="main content">
                 <div className="sidebar column-container cell">
@@ -144,14 +105,18 @@ class App extends React.Component {
                     {Routes(this.pageComponent)}
                 </div>
                 {this.state.inHexapodPage ? (
-                    <HexapodPlot
-                        hexapod={this.state.hexapod}
-                        revision={this.state.revision}
-                    />
+                    <div className="plot border">
+                        <Suspense fallback={<h1>Loading 3d plot...</h1>}>
+                            <HexapodPlot
+                                hexapod={this.state.hexapod}
+                                revision={this.state.revision}
+                            />
+                        </Suspense>
+                    </div>
                 ) : null}
             </div>
             {this.state.inHexapodPage ? <NavDetailed /> : null}
-        </Router>
+        </>
     )
 }
 

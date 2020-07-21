@@ -21,7 +21,7 @@ class InverseKinematicsPage extends Component {
 
     updateHexapodPlot = (hexapod, ikParams) => {
         this.setState({ ikParams, errorMessage: null })
-        this.props.onUpdate(hexapod)
+        this.props.onUpdate("hexapod", { hexapod })
     }
 
     updateIkParams = (name, value) => {

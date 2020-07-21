@@ -16,7 +16,7 @@ class DimensionsWidget extends Component {
 
     updateDimensions = (name, value) => {
         const dimensions = { ...this.props.params.dimensions, [name]: value }
-        this.props.onUpdate(dimensions)
+        this.props.onUpdate("dimensions", { dimensions })
     }
 
     get toggleSwitch() {

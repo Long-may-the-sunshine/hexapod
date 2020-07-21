@@ -18,7 +18,7 @@ class ForwardKinematicsPage extends Component {
             ...pose,
             [name]: { ...pose[name], [angle]: value },
         }
-        this.props.onUpdate(newPose)
+        this.props.onUpdate("pose", { pose: newPose })
     }
 
     toggleMode = () => {

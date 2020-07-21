@@ -25,7 +25,7 @@ class LegPatternPage extends Component {
             newPose[leg] = patternParams
         }
 
-        this.props.onUpdate(newPose)
+        this.props.onUpdate("pose", { pose: newPose })
         this.setState({ patternParams })
     }
 

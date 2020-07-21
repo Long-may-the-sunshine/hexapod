@@ -21,8 +21,6 @@ function gtag() {
     window.dataLayer.push(arguments)
 }
 
-
-
 class App extends React.Component {
     state = {
         inHexapodPage: false,
@@ -45,10 +43,31 @@ class App extends React.Component {
         }
 
         this.setState({ inHexapodPage: true })
-        this.updatePlot(this.state.hexapod.dimensions, defaults.DEFAULT_POSE)
+        this.manageState("both", {
+            dimensions: this.state.hexapod.dimensions,
+            pose: defaults.DEFAULT_POSE,
+        })
     }
 
-    updatePlotWithHexapod = hexapod => {
+    manageState = (type, newParams) => {
+        let hexapod = null
+
+        if (type === "pose") {
+            hexapod = new VirtualHexapod(this.state.hexapod.dimensions, newParams.pose)
+        }
+
+        if (type === "dimensions") {
+            hexapod = new VirtualHexapod(newParams.dimensions, this.state.hexapod.pose)
+        }
+
+        if (type === "hexapod") {
+            hexapod = newParams.hexapod
+        }
+
+        if (type === "both") {
+            hexapod = new VirtualHexapod(newParams.dimensions, newParams.pose)
+        }
+
         if (!hexapod || !hexapod.foundSolution) {
             return
         }
@@ -59,15 +78,6 @@ class App extends React.Component {
         })
     }
 
-    updatePlot = (dimensions, pose) => {
-        const newHexapodModel = new VirtualHexapod(dimensions, pose)
-        this.updatePlotWithHexapod(newHexapodModel)
-    }
-
-    updateDimensions = dimensions => this.updatePlot(dimensions, this.state.hexapod.pose)
-
-    updatePose = pose => this.updatePlot(this.state.hexapod.dimensions, pose)
-
     /* * * * * * * * * * * * * *
      * Widgets
      * * * * * * * * * * * * * */
@@ -76,7 +86,7 @@ class App extends React.Component {
         <div hidden={!this.state.inHexapodPage}>
             <DimensionsWidget
                 params={{ dimensions: this.state.hexapod.dimensions }}
-                onUpdate={this.updateDimensions}
+                onUpdate={this.manageState}
             />
         </div>
     )
@@ -84,11 +94,24 @@ class App extends React.Component {
     /* * * * * * * * * * * * * *
      * Pages
      * * * * * * * * * * * * * */
-    pageComponent = (Component, onUpdate) => (
+    pageComponent = Component => (
         <Suspense fallback={<h1>Loading page</h1>}>
             <Component
                 onMount={this.onPageLoad}
-                onUpdate={onUpdate}
+                onUpdate={this.manageState}
+                params={{
+                    pose: this.state.hexapod.pose,
+                    dimensions: this.state.hexapod.dimensions,
+                }}
+            />
+        </Suspense>
+    )
+
+    pageComponent = (Component) => (
+        <Suspense fallback={<h1>Loading page</h1>}>
+            <Component
+                onMount={this.onPageLoad}
+                onUpdate={this.manageState}
                 params={{
                     pose: this.state.hexapod.pose,
                     dimensions: this.state.hexapod.dimensions,
@@ -99,13 +122,13 @@ class App extends React.Component {
 
     pageLanding = () => this.pageComponent(LandingPage)
 
-    pagePatterns = () => this.pageComponent(LegPatternPage, this.updatePose)
+    pagePatterns = () => this.pageComponent(LegPatternPage)
 
-    pageIk = () => this.pageComponent(InverseKinematicsPage, this.updatePlotWithHexapod)
+    pageIk = () => this.pageComponent(InverseKinematicsPage)
 
-    pageFk = () => this.pageComponent(ForwardKinematicsPage, this.updatePose)
+    pageFk = () => this.pageComponent(ForwardKinematicsPage)
 
-    pageWalking = () => this.pageComponent(WalkingGaitsPage, this.updatePlotWithHexapod)
+    pageWalking = () => this.pageComponent(WalkingGaitsPage)
 
     page = () => (
         <Switch>

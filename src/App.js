@@ -107,36 +107,23 @@ class App extends React.Component {
         </Suspense>
     )
 
-    pageComponent = (Component) => (
-        <Suspense fallback={<h1>Loading page</h1>}>
-            <Component
-                onMount={this.onPageLoad}
-                onUpdate={this.manageState}
-                params={{
-                    pose: this.state.hexapod.pose,
-                    dimensions: this.state.hexapod.dimensions,
-                }}
-            />
-        </Suspense>
-    )
-
-    pageLanding = () => this.pageComponent(LandingPage)
-
-    pagePatterns = () => this.pageComponent(LegPatternPage)
-
-    pageIk = () => this.pageComponent(InverseKinematicsPage)
-
-    pageFk = () => this.pageComponent(ForwardKinematicsPage)
-
-    pageWalking = () => this.pageComponent(WalkingGaitsPage)
-
     page = () => (
         <Switch>
-            <Route path="/" exact component={this.pageLanding} />
-            <Route path={PATHS.legPatterns.path} exact component={this.pagePatterns} />
-            <Route path={PATHS.forwardKinematics.path} exact component={this.pageFk} />
-            <Route path={PATHS.inverseKinematics.path} exact component={this.pageIk} />
-            <Route path={PATHS.walkingGaits.path} exact component={this.pageWalking} />
+            <Route path="/" exact>
+                {this.pageComponent(LandingPage)}
+            </Route>
+            <Route path={PATHS.legPatterns.path} exact>
+                {this.pageComponent(LegPatternPage)}
+            </Route>
+            <Route path={PATHS.forwardKinematics.path} exact>
+                {this.pageComponent(InverseKinematicsPage)}
+            </Route>
+            <Route path={PATHS.inverseKinematics.path} exact>
+                {this.pageComponent(ForwardKinematicsPage)}
+            </Route>
+            <Route path={PATHS.walkingGaits.path} exact>
+                {this.pageComponent(WalkingGaitsPage)}
+            </Route>
             <Route>
                 <Redirect to="/" />
             </Route>

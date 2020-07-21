@@ -1,9 +1,11 @@
 import React, { Suspense } from "react"
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom"
 import { VirtualHexapod } from "./hexapod"
 import * as defaults from "./templates"
-import { SECTION_NAMES, PATHS } from "./components/vars"
+import { SECTION_NAMES } from "./components/vars"
 import { Nav, NavDetailed, DimensionsWidget } from "./components"
+
+import { PATHS } from "./components/vars"
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom"
 import { ForwardKinematicsPage, LegPatternPage, LandingPage } from "./components/pages"
 
 const HexapodPlot = React.lazy(() =>
@@ -16,11 +18,33 @@ const WalkingGaitsPage = React.lazy(() =>
     import(/* webpackPrefetch: true */ "./components/pages/WalkingGaitsPage")
 )
 
+const Routes = pageComponent => (
+    <Switch>
+        <Route path="/" exact>
+            {pageComponent(LandingPage)}
+        </Route>
+        <Route path={PATHS.legPatterns.path} exact>
+            {pageComponent(LegPatternPage)}
+        </Route>
+        <Route path={PATHS.forwardKinematics.path} exact>
+            {pageComponent(InverseKinematicsPage)}
+        </Route>
+        <Route path={PATHS.inverseKinematics.path} exact>
+            {pageComponent(ForwardKinematicsPage)}
+        </Route>
+        <Route path={PATHS.walkingGaits.path} exact>
+            {pageComponent(WalkingGaitsPage)}
+        </Route>
+        <Route>
+            <Redirect to="/" />
+        </Route>
+    </Switch>
+)
+
 window.dataLayer = window.dataLayer || []
 function gtag() {
     window.dataLayer.push(arguments)
 }
-
 class App extends React.Component {
     state = {
         inHexapodPage: false,
@@ -107,29 +131,6 @@ class App extends React.Component {
         </Suspense>
     )
 
-    page = () => (
-        <Switch>
-            <Route path="/" exact>
-                {this.pageComponent(LandingPage)}
-            </Route>
-            <Route path={PATHS.legPatterns.path} exact>
-                {this.pageComponent(LegPatternPage)}
-            </Route>
-            <Route path={PATHS.forwardKinematics.path} exact>
-                {this.pageComponent(InverseKinematicsPage)}
-            </Route>
-            <Route path={PATHS.inverseKinematics.path} exact>
-                {this.pageComponent(ForwardKinematicsPage)}
-            </Route>
-            <Route path={PATHS.walkingGaits.path} exact>
-                {this.pageComponent(WalkingGaitsPage)}
-            </Route>
-            <Route>
-                <Redirect to="/" />
-            </Route>
-        </Switch>
-    )
-
     /* * * * * * * * * * * * * *
      * Layout
      * * * * * * * * * * * * * */
@@ -140,7 +141,7 @@ class App extends React.Component {
             <div className="main content">
                 <div className="sidebar column-container cell">
                     {this.dimensions()}
-                    {this.page()}
+                    {Routes(this.pageComponent)}
                 </div>
                 {this.state.inHexapodPage ? (
                     <HexapodPlot

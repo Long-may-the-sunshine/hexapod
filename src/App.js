@@ -29,13 +29,8 @@ class App extends React.Component {
             page_path: window.location.pathname + window.location.search,
         })
 
-        if (pageName === SECTION_NAMES.landingPage) {
-            this.setState({ inHexapodPage: false })
-            return
-        }
-
-        this.setState({ inHexapodPage: true })
-        this.manageState("pose", { pose: defaults.DEFAULT_POSE })
+        this.setState({ inHexapodPage: pageName !== SECTION_NAMES.landingPage })
+        document.title = pageName + " - Mithi's Hexapod Robot Simulator"
     }
 
     manageState = (type, newParams) => {
@@ -64,19 +59,6 @@ class App extends React.Component {
     }
 
     /* * * * * * * * * * * * * *
-     * Widgets
-     * * * * * * * * * * * * * */
-
-    dimensions = () => (
-        <div hidden={!this.state.inHexapodPage}>
-            <DimensionsWidget
-                params={{ dimensions: this.state.hexapod.dimensions }}
-                onUpdate={this.manageState}
-            />
-        </div>
-    )
-
-    /* * * * * * * * * * * * * *
      * Pages
      * * * * * * * * * * * * * */
     pageComponent = Component => (
@@ -101,19 +83,22 @@ class App extends React.Component {
             <Nav />
             <div className="main content">
                 <div className="sidebar column-container cell">
-                    {this.dimensions()}
+                    <div hidden={!this.state.inHexapodPage}>
+                        <DimensionsWidget
+                            params={{ dimensions: this.state.hexapod.dimensions }}
+                            onUpdate={this.manageState}
+                        />
+                    </div>
                     {Routes(this.pageComponent)}
                 </div>
-                {this.state.inHexapodPage ? (
-                    <div className="plot border">
-                        <Suspense fallback={<h1>Loading 3d plot...</h1>}>
-                            <HexapodPlot
-                                hexapod={this.state.hexapod}
-                                revision={this.state.revision}
-                            />
-                        </Suspense>
-                    </div>
-                ) : null}
+                <div className="plot border">
+                    <Suspense fallback={<p>Loading 3d plot...</p>}>
+                        <HexapodPlot
+                            hexapod={this.state.hexapod}
+                            revision={this.state.revision}
+                        />
+                    </Suspense>
+                </div>
             </div>
             {this.state.inHexapodPage ? <NavDetailed /> : null}
         </>

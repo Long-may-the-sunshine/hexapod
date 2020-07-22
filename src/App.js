@@ -8,11 +8,6 @@ const HexapodPlot = React.lazy(() =>
     import(/* webpackPrefetch: true */ "./components/HexapodPlot")
 )
 
-window.dataLayer = window.dataLayer || []
-function gtag() {
-    window.dataLayer.push(arguments)
-}
-
 class App extends React.Component {
     state = {
         inHexapodPage: false,
@@ -25,10 +20,6 @@ class App extends React.Component {
      * * * * * * * * * * * * * */
 
     onPageLoad = pageName => {
-        gtag("config", "UA-170794768-1", {
-            page_path: window.location.pathname + window.location.search,
-        })
-
         this.setState({ inHexapodPage: pageName !== SECTION_NAMES.landingPage })
         document.title = pageName + " - Mithi's Hexapod Robot Simulator"
     }

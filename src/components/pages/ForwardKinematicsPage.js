@@ -3,6 +3,7 @@ import LegPoseWidget from "./LegPoseWidgets"
 import { Card, ToggleSwitch, ResetButton, NumberInputField, Slider } from "../generic"
 import { DEFAULT_POSE } from "../../templates"
 import { SECTION_NAMES, LEG_NAMES } from "../vars"
+import { VirtualHexapod } from "../../hexapod"
 
 class ForwardKinematicsPage extends Component {
     pageName = SECTION_NAMES.forwardKinematics
@@ -13,7 +14,10 @@ class ForwardKinematicsPage extends Component {
         this.reset()
     }
 
-    reset = () => this.props.onUpdate(DEFAULT_POSE)
+    reset = () => {
+        const hexapod = new VirtualHexapod(this.props.params.dimensions, DEFAULT_POSE)
+        this.props.onUpdate(hexapod)
+    }
 
     updatePose = (name, angle, value) => {
         const pose = this.props.params.pose
@@ -21,7 +25,8 @@ class ForwardKinematicsPage extends Component {
             ...pose,
             [name]: { ...pose[name], [angle]: value },
         }
-        this.props.onUpdate("pose", { pose: newPose })
+        const hexapod = new VirtualHexapod(this.props.params.dimensions, newPose)
+        this.props.onUpdate(hexapod)
     }
 
     toggleMode = () => {

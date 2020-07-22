@@ -9,8 +9,12 @@ import {
 } from "./hexapodParams"
 
 import { DATA, LAYOUT, DATA_INDEX_MAP, SCENE, CAMERA_VIEW } from "./plotParams"
+import { VirtualHexapod } from "../hexapod"
+
+const VIRTUAL_HEXAPOD = new VirtualHexapod(DEFAULT_DIMENSIONS, DEFAULT_POSE)
 
 export {
+    VIRTUAL_HEXAPOD,
     DEFAULT_DIMENSIONS,
     DEFAULT_LEG_DIMENSIONS,
     DEFAULT_BODY_DIMENSIONS,

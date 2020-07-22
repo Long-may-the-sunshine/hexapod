@@ -91,7 +91,7 @@ class WalkingGaitsPage extends Component {
         }
 
         const matrix = tRotZmatrix(currentTwist)
-        this.props.onUpdate("hexapod", { hexapod: hexapod.cloneTrot(matrix) })
+        this.props.onUpdate(hexapod.cloneTrot(matrix))
     }
 
     setWalkSequence = (gaitParams, isTripodGait, inWalkMode) => {

@@ -3,6 +3,7 @@ import NumberInputField from "./generic/NumberInputField"
 import { Card, ResetButton, ToggleSwitch } from "./generic/SmallWidgets"
 import { DEFAULT_DIMENSIONS } from "../templates"
 import { SECTION_NAMES, DIMENSION_NAMES, RANGE_PARAMS } from "./vars"
+import { VirtualHexapod } from "../hexapod"
 
 class DimensionsWidget extends Component {
     sectionName = SECTION_NAMES.dimensions
@@ -16,7 +17,8 @@ class DimensionsWidget extends Component {
 
     updateDimensions = (name, value) => {
         const dimensions = { ...this.props.params.dimensions, [name]: value }
-        this.props.onUpdate("dimensions", { dimensions })
+        const hexapod = new VirtualHexapod(dimensions, this.props.params.pose)
+        this.props.onUpdate(hexapod)
     }
 
     get toggleSwitch() {

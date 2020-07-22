@@ -1,8 +1,7 @@
 import React, { Suspense } from "react"
-import { VirtualHexapod } from "./hexapod"
-import * as defaults from "./templates"
 import { SECTION_NAMES } from "./components/vars"
 import { Nav, NavDetailed, DimensionsWidget } from "./components"
+import { VIRTUAL_HEXAPOD } from "./templates"
 import Routes from "./Routes"
 
 const HexapodPlot = React.lazy(() =>
@@ -13,10 +12,11 @@ window.dataLayer = window.dataLayer || []
 function gtag() {
     window.dataLayer.push(arguments)
 }
+
 class App extends React.Component {
     state = {
         inHexapodPage: false,
-        hexapod: new VirtualHexapod(defaults.DEFAULT_DIMENSIONS, defaults.DEFAULT_POSE),
+        hexapod: VIRTUAL_HEXAPOD,
         revision: 0,
     }
 
@@ -33,21 +33,7 @@ class App extends React.Component {
         document.title = pageName + " - Mithi's Hexapod Robot Simulator"
     }
 
-    manageState = (type, newParams) => {
-        let hexapod = null
-
-        if (type === "pose") {
-            hexapod = new VirtualHexapod(this.state.hexapod.dimensions, newParams.pose)
-        }
-
-        if (type === "dimensions") {
-            hexapod = new VirtualHexapod(newParams.dimensions, this.state.hexapod.pose)
-        }
-
-        if (type === "hexapod") {
-            hexapod = newParams.hexapod
-        }
-
+    manageState = hexapod => {
         if (!hexapod || !hexapod.foundSolution) {
             return
         }
@@ -85,7 +71,10 @@ class App extends React.Component {
                 <div className="sidebar column-container cell">
                     <div hidden={!this.state.inHexapodPage}>
                         <DimensionsWidget
-                            params={{ dimensions: this.state.hexapod.dimensions }}
+                            params={{
+                                dimensions: this.state.hexapod.dimensions,
+                                pose: this.state.hexapod.pose,
+                            }}
                             onUpdate={this.manageState}
                         />
                     </div>

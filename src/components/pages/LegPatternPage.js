@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import { sliderList, Card, ResetButton } from "../generic"
 import { DEFAULT_POSE, DEFAULT_PATTERN_PARAMS } from "../../templates"
 import { SECTION_NAMES, ANGLE_NAMES } from "../vars"
+import { VirtualHexapod } from "../../hexapod"
 
 class LegPatternPage extends Component {
     pageName = SECTION_NAMES.legPatterns
@@ -13,7 +14,8 @@ class LegPatternPage extends Component {
     }
 
     reset = () => {
-        this.props.onUpdate(DEFAULT_POSE)
+        const hexapod = new VirtualHexapod(this.props.params.dimensions, DEFAULT_POSE)
+        this.props.onUpdate(hexapod)
         this.setState({ patternParams: DEFAULT_PATTERN_PARAMS })
     }
 
@@ -24,8 +26,8 @@ class LegPatternPage extends Component {
         for (const leg in DEFAULT_POSE) {
             newPose[leg] = patternParams
         }
-
-        this.props.onUpdate("pose", { pose: newPose })
+        const hexapod = new VirtualHexapod(this.props.params.dimensions, newPose)
+        this.props.onUpdate(hexapod)
         this.setState({ patternParams })
     }
 

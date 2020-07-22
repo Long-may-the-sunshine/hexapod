@@ -8,25 +8,42 @@
         <meta name="description" content="Mithi's Hexapod Robot Simulator" />
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <title>Mithi's Hexapod Robot Simulator</title>
-        <!--
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-        -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
 
-
-        <link rel="preconnect" crossorigin href="https://www.google-analytics.com">
-        <link rel="dns-prefetch" href="https://www.google-analytics.com">
-        <script defer src="https://www.googletagmanager.com/gtag/js?id=UA-170794768-1"></script>
-        <script>
-            window.dataLayer = window.dataLayer || []
-            function gtag() { dataLayer.push(arguments) }
-            gtag('js', new Date())
-            gtag('config', 'UA-170794768-1')
-        </script>
-
+        <link rel="preconnect" href="https://www.google-analytics.com"  />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="//www.googletagmanager.com"  />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <script
+            defer
+            src="https://www.googletagmanager.com/gtag/js?id=UA-170794768-1"
+        ></script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="root"></div>
+        <script>
+            window.dataLayer = window.dataLayer || []
+            function gtag() {
+                dataLayer.push(arguments)
+            }
+            gtag("js", new Date())
+            gtag("config", "UA-170794768-1")
+        </script>
+        <script type="text/javascript">
+            WebFontConfig = {
+                google: { families: ["Permanent+Marker:400"] },
+            }
+            ;(function () {
+                var wf = document.createElement("script")
+                wf.src = "https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js"
+                wf.type = "text/javascript"
+                wf.async = "true"
+                var s = document.getElementsByTagName("script")[0]
+                s.parentNode.insertBefore(wf, s)
+            })()
+        </script>
     </body>
 </html>

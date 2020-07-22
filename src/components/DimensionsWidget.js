@@ -9,7 +9,11 @@ class DimensionsWidget extends Component {
     sectionName = SECTION_NAMES.dimensions
     state = { isFine: true }
 
-    reset = () => this.props.onUpdate(DEFAULT_DIMENSIONS)
+    reset = () => {
+        this.props.onUpdate(DEFAULT_DIMENSIONS)
+        const hexapod = new VirtualHexapod(DEFAULT_DIMENSIONS, this.props.params.pose)
+        this.props.onUpdate(hexapod)
+    }
 
     toggleMode = () => this.setState({ isFine: !this.state.isFine })
 

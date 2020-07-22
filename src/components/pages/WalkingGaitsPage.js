@@ -47,8 +47,7 @@ class WalkingGaitsPage extends Component {
 
     componentDidMount = () => {
         this.props.onMount(this.pageName)
-        const { isTripodGait, inWalkMode } = this.state
-        this.setWalkSequence(DEFAULT_GAIT_PARAMS, isTripodGait, inWalkMode)
+        this.reset()
     }
 
     componentWillUnmount = () => {

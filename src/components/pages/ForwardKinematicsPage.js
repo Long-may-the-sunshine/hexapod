@@ -8,7 +8,10 @@ class ForwardKinematicsPage extends Component {
     pageName = SECTION_NAMES.forwardKinematics
     state = { WidgetType: NumberInputField }
 
-    componentDidMount = () => this.props.onMount(this.pageName)
+    componentDidMount = () => {
+        this.props.onMount(this.pageName)
+        this.reset()
+    }
 
     reset = () => this.props.onUpdate(DEFAULT_POSE)
 

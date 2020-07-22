@@ -9,7 +9,10 @@ class InverseKinematicsPage extends Component {
     pageName = SECTION_NAMES.inverseKinematics
     state = { ikParams: DEFAULT_IK_PARAMS, errorMessage: null }
 
-    componentDidMount = () => this.props.onMount(this.pageName)
+    componentDidMount = () => {
+        this.props.onMount(this.pageName)
+        this.reset()
+    }
 
     reset = () => {
         const result = solveInverseKinematics(
